@@ -8,6 +8,10 @@ output: html_document
 library(readr)
 carData <-read.csv ("car data.csv")
 head(carData)
+CAR_DETAILS_FROM_CAR_DEKHO <- read_csv("CAR DETAILS FROM CAR DEKHO.csv")
+head(CAR_DETAILS_FROM_CAR_DEKHO)
+Car_details_v3 <- read_csv("Car details v3.csv")
+head(Car_details_v3)
 ```
 
 
