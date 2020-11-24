@@ -1,0 +1,13 @@
+---
+title: "stat 350 final project"
+author: "GROUP 8"
+date: "2020/11/24"
+output: html_document
+---
+```{r}
+library(readr)
+carData <-read.csv ("car data.csv")
+head(carData)
+```
+
+
