@@ -15,33 +15,44 @@ head(Car_details_v3)
 ```
 
 
+
 ```{r}
-# install.packages(readr)
 library(readr)
 library(MASS)
+library(stringr)
 
-data1 <-read.csv ("car data.csv")
-dim(data1) # 301 9
-carData <- data1[complete.cases(data1), ]
-carData
-head(carData)
-names(carData) # "Car_Name" "Year" "Selling_Price" "Present_Price" "Kms_Driven" "Fuel_Type" "Seller_Type" "Transmission" "Owner"   
-dim(carData) # 301 9
+data3 <- read_csv("Car details v3.csv")
+dim(data3) # 8128 13
+Car_details_v3 <- data3[complete.cases(data3), ]
+head(Car_details_v3)
+names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner" "mileage" "engine" "max_power" "torque" "seats"  
+dim(Car_details_v3) # 7906 13
 
-petrol <- ifelse(carData$Fuel_Type == "Petrol", 1, 0)
-diesel <- ifelse(carData$Fuel_Type == "Diesel", 1, 0)
-CNG <- ifelse(carData$Fuel_Type == "CNG", 1, 0)
+a = str_split_fixed(Car_details_v3$name, " ", 2)
+Car_details_v3 = cbind(a, Car_details_v3)
+colnames(Car_details_v3)[which(names(Car_details_v3) == "1")] <- "manufacturer"
+unique(Car_details_v3$manufacturer)
+Car_details_v3 <- Car_details_v3[, -2]
+head(Car_details_v3)
 
-dealer <- ifelse(carData$Seller_Type == "Dealer", 1, 0)
-individual <- ifelse(carData$Seller_Type == "Individual", 1, 0)
+petrol <- ifelse(Car_details_v3$fuel == "Petrol", 1, 0)
+diesel <- ifelse(Car_details_v3$fuel == "Diesel", 1, 0)
+# Other
 
-manual <- ifelse(carData$Transmission == "Manual", 1, 0)
-automatic <- ifelse(carData$Transmission == "Automatic", 1, 0)
+dealer <- ifelse(Car_details_v3$seller_type == "Dealer", 1, 0)
+#individual <- ifelse(Car_details_v3$seller_type == "Individual", 1, 0)
 
-car <- cbind(carData, petrol, diesel, CNG, dealer, individual, manual, automatic)
-car
+manual <- ifelse(Car_details_v3$transmission == "Manual", 1, 0)
+#automatic <- ifelse(Car_details_v3$transmission == "Automatic", 1, 0)
 
-lm1 <- lm(Selling_Price ~ . - Car_Name - Fuel_Type - Seller_Type - Transmission, data = car)
+first_owner <- ifelse(Car_details_v3$owner == "First Owner", 1, 0)
+second_owner <- ifelse(Car_details_v3$owner == "Second Owner", 1, 0)
+# Other
+
+car <- cbind(Car_details_v3, petrol, diesel, dealer, manual, first_owner, second_owner)
+head(car)
+
+lm1 <- lm(selling_price ~ . - name - fuel - seller_type - transmission - owner - mileage - engine - max_power - torque - manufacturer, data = car)
 summary(lm1)
 anova(lm1)
 plot(lm1)
@@ -49,7 +60,8 @@ vcov(lm1)
 vif(lm1)
 confint(lm1, level = 0.95)
 
-robust.lm <- rlm(Selling_Price ~ .-Car_Name, data = carData, psi = psi.huber)
+robust.lm <- rlm(selling_price ~ . - name - fuel - seller_type - transmission - owner - mileage - engine - max_power - torque - manufacturer,
+                  data = Car_details_v3, psi = psi.huber)
 summary(robust.lm)
 plot(robust.lm)
 (weights <- robust.lm$w)
@@ -59,41 +71,21 @@ plot(weights, main = "Weights v.s. the Observation Number")
 
 
 set.seed(1168)
-nsamp = ceiling(0.8*length(car$Selling_Price))
-training_samps = sample(c(1:length(car$Selling_Price)),nsamp)
+nsamp = ceiling(0.8*length(car$selling_price))
+training_samps = sample(c(1:length(car$selling_price)),nsamp)
 training_samps = sort(training_samps)
 train_data <- car[training_samps, ]
 test_data <- car[-training_samps, ]
-head(test_data[,-1])
 
-train.lm <- lm(Selling_Price ~ . - Fuel_Type - Seller_Type - Transmission, 
-               data = train_data[,-1])
+train.lm <- lm(selling_price ~ . - name - fuel - seller_type - transmission - owner - mileage - engine - max_power - torque - manufacturer,
+               data = train_data)
 summary(train.lm)
 
 preds <- predict(train.lm, test_data[,-1])
 
-plot(test_data$Selling_Price, preds, xlim=c(15,40), ylim=c(15,40))
+plot(test_data$selling_price, preds, xlim=c(15,40), ylim=c(15,40))
 abline(c(0,1))
 
-
-```
-
-
-
-```{r}
-data2 <- read_csv("CAR DETAILS FROM CAR DEKHO.csv")
-dim(data2) # 4340 8
-CAR_DETAILS_FROM_CAR_DEKHO <- data2[complete.cases(data2), ]
-head(CAR_DETAILS_FROM_CAR_DEKHO)
-names(CAR_DETAILS_FROM_CAR_DEKHO) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner"        
-dim(CAR_DETAILS_FROM_CAR_DEKHO) # 4340 8
-
-data3 <- read_csv("Car details v3.csv")
-dim(data3) # 8128 13
-Car_details_v3 <- data3[complete.cases(data3), ]
-head(Car_details_v3)
-names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner" "mileage" "engine" "max_power" "torque" "seats"  
-dim(Car_details_v3) # 7906 13
 ```
 
 
