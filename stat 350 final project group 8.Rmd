@@ -54,6 +54,8 @@ car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen",
 car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel")] <- "other"
 
 head(car)
+car$manufacturer=as.factor(car$manufacturer) #no test may changed: frank wang 
+
 car$years = as.double(car$years)
 car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
