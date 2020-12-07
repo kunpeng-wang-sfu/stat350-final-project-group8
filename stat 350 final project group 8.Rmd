@@ -18,17 +18,10 @@ head(Car_details_v3)
 names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner" "mileage" "engine" "max_power" "torque" "seats"  
 dim(Car_details_v3) # 7906 13
 
-
-petrol <- ifelse(Car_details_v3$fuel == "Petrol", 1, 0)
-diesel <- ifelse(Car_details_v3$fuel == "Diesel", 1, 0)
-# Other
-dealer <- ifelse(Car_details_v3$seller_type == "Dealer", 1, 0)
-#individual <- ifelse(Car_details_v3$seller_type == "Individual", 1, 0)
-manual <- ifelse(Car_details_v3$transmission == "Manual", 1, 0)
-#automatic <- ifelse(Car_details_v3$transmission == "Automatic", 1, 0)
-first_owner <- ifelse(Car_details_v3$owner == "First Owner", 1, 0)
-second_owner <- ifelse(Car_details_v3$owner == "Second Owner", 1, 0)
-# Other
+Car_details_v3$fuel=as.factor(Car_details_v3$fuel)
+Car_details_v3$seller_type=as.factor(Car_details_v3$seller_type)
+Car_details_v3$transmission=as.factor(Car_details_v3$transmission)
+Car_details_v3$owner=as.factor(Car_details_v3$owner)
 
 
 years = 2020 - Car_details_v3$year
@@ -39,16 +32,19 @@ Max_power= str_split_fixed(Car_details_v3$max_power, " ", 2)
 
 sub_1 = cbind(Name,years,Mileage,Engine,Max_power)
 sub_2 = sub_1[,-c(2,5,7,9)]
-car <- cbind(sub_2,Car_details_v3, petrol, diesel, dealer, manual, first_owner, second_owner)
+car <- cbind(sub_2,Car_details_v3)
 
 colnames(car)[which(names(car) == "V1")] <- "manufacturer"
 colnames(car)[which(names(car) == "V3")] <- "Mileage"
 colnames(car)[which(names(car) == "V4")] <- "Engine"
 colnames(car)[which(names(car) == "V5")] <- "Max_power"
-car <- subset(car, select = -c(name,year,fuel, seller_type, transmission, owner, mileage, engine, max_power))
+car <- subset(car, select = -c(name,year, mileage, engine, max_power))
+
 head(car)
-
-
+car$years = as.double(car$years)
+car$Mileage = as.double(car$Mileage)
+car$Engine = as.double(car$Engine)
+car$Max_power = as.double(car$Max_power)
 
 
 lm1 <- lm(selling_price ~ .  - torque - manufacturer, data = car)
@@ -58,7 +54,7 @@ plot(lm1)
 vcov(lm1)
 vif(lm1)
 confint(lm1, level = 0.95)
-robust.lm <- rlm(selling_price ~ .  - torque - manufacturer,
+robust.lm <- rlm(selling_price ~ .  - torque ,
                   data = Car_details_v3, psi = psi.huber)
 summary(robust.lm)
 plot(robust.lm)
@@ -72,7 +68,7 @@ training_samps = sample(c(1:length(car$selling_price)),nsamp)
 training_samps = sort(training_samps)
 train_data <- car[training_samps, ]
 test_data <- car[-training_samps, ]
-train.lm <- lm(selling_price ~ . - name - torque - manufacturer,
+train.lm <- lm(selling_price ~ .  - torque - manufacturer,
                data = train_data)
 summary(train.lm)
 preds <- predict(train.lm, test_data[,-1])
