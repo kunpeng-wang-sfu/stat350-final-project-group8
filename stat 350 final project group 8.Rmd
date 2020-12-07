@@ -30,33 +30,35 @@ first_owner <- ifelse(Car_details_v3$owner == "First Owner", 1, 0)
 second_owner <- ifelse(Car_details_v3$owner == "Second Owner", 1, 0)
 # Other
 
-Name = str_split_fixed(Car_details_v3$name, " ", 2)
-Car_details_v3 = cbind(Name, Car_details_v3)
-colnames(Car_details_v3)[which(names(Car_details_v3) == "1")] <- "manufacturer"
-unique(Car_details_v3$manufacturer)
-Car_details_v3 <- Car_details_v3[, -2]
 
+years = 2020 - Car_details_v3$year
+Name = str_split_fixed(Car_details_v3$name, " ", 2)
 Mileage= str_split_fixed(Car_details_v3$mileage, " ", 2)
 Engine= str_split_fixed(Car_details_v3$engine, " ", 2)
 Max_power= str_split_fixed(Car_details_v3$max_power, " ", 2)
-sub_1 = cbind(Mileage,Engine,Max_power)
-sub_2 = sub_1[,-c(2,4,6)]
-car_temp <- cbind(Car_details_v3, petrol, diesel, dealer, manual, first_owner, second_owner)
-car <- cbind(car_temp, sub_2)
-colnames(car)[which(names(car) == "1")] <- "Mileage"
-colnames(car)[which(names(car) == "2")] <- "Engine"
-colnames(car)[which(names(car) == "3")] <- "Max_power"
-car <- subset(car, select = -c(fuel, seller_type, transmission, owner, mileage, engine, max_power))
+
+sub_1 = cbind(Name,years,Mileage,Engine,Max_power)
+sub_2 = sub_1[,-c(2,5,7,9)]
+car <- cbind(sub_2,Car_details_v3, petrol, diesel, dealer, manual, first_owner, second_owner)
+
+colnames(car)[which(names(car) == "V1")] <- "manufacturer"
+colnames(car)[which(names(car) == "V3")] <- "Mileage"
+colnames(car)[which(names(car) == "V4")] <- "Engine"
+colnames(car)[which(names(car) == "V5")] <- "Max_power"
+car <- subset(car, select = -c(name,year,fuel, seller_type, transmission, owner, mileage, engine, max_power))
 head(car)
 
-lm1 <- lm(selling_price ~ . - name - torque - manufacturer, data = car)
+
+
+
+lm1 <- lm(selling_price ~ .  - torque - manufacturer, data = car)
 summary(lm1)
 anova(lm1)
 plot(lm1)
 vcov(lm1)
 vif(lm1)
 confint(lm1, level = 0.95)
-robust.lm <- rlm(selling_price ~ . - name - torque - manufacturer,
+robust.lm <- rlm(selling_price ~ .  - torque - manufacturer,
                   data = Car_details_v3, psi = psi.huber)
 summary(robust.lm)
 plot(robust.lm)
