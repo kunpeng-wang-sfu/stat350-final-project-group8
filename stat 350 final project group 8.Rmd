@@ -46,12 +46,12 @@ unique(car$manufacturer)
 #japan <-c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")
 #car[manufacturer %in% japan, country := "japan"]
 car$manufacturer = as.character(car$manufacturer)
-car$manufacturer[car$manufacturer %in% c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "japan"
+car$manufacturer[car$manufacturer %in% c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "Japan"
 
-car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "europe"
+car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "Europe"
 
-car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen","BMW")] <- "us"
-car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel")] <- "other"
+car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen","BMW")] <- "US"
+car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel")] <- "Others"
 
 head(car)
 car$manufacturer=as.factor(car$manufacturer) #no test may changed: frank wang 
