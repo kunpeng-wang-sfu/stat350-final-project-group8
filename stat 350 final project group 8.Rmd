@@ -18,6 +18,7 @@ head(Car_details_v3)
 names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner" "mileage" "engine" "max_power" "torque" "seats"  
 dim(Car_details_v3) # 7906 13
 
+
 Car_details_v3$fuel=as.factor(Car_details_v3$fuel)
 Car_details_v3$seller_type=as.factor(Car_details_v3$seller_type)
 Car_details_v3$transmission=as.factor(Car_details_v3$transmission)
@@ -46,6 +47,15 @@ car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
 car$Max_power = as.double(car$Max_power)
 
+
+full.model = lm(selling_price ~ .- torque -manufacturer, data = car)
+step.model_for = stepAIC(full.model, direction = "forward", trace = FALSE)
+step.model_back = stepAIC(full.model, direction = "backward", trace = FALSE)
+step.model_both= stepAIC(full.model, direction = "both", trace = FALSE)
+
+summary(step.model_for)
+summary(step.model_back)
+summary(step.model_both)
 
 lm1 <- lm(selling_price ~ .  - torque - manufacturer, data = car)
 summary(lm1)
