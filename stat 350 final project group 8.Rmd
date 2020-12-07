@@ -10,6 +10,7 @@ output: html_document
 library(readr)
 library(MASS)
 library(stringr)
+library(car)
 
 
 data3 <- read_csv("Car details v3.csv")
@@ -58,6 +59,9 @@ car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
 car$Max_power = as.double(car$Max_power)
 
+mydata <- car[, -c(1,8,9,10,11,12)]
+head(mydata)
+pairs(mydata)
 
 full.model = lm(selling_price ~ .- torque -manufacturer, data = car)
 step.model_for = stepAIC(full.model, direction = "forward", trace = FALSE)
