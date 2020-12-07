@@ -52,11 +52,6 @@ car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswa
 car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen","BMW")] <- "us"
 car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel")] <- "other"
 
-
-
-
-View(car)
-```
 head(car)
 car$years = as.double(car$years)
 car$Mileage = as.double(car$Mileage)
