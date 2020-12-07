@@ -10,6 +10,7 @@ output: html_document
 library(readr)
 library(MASS)
 library(stringr)
+library(car)
 
 data3 <- read_csv("Car details v3.csv")
 dim(data3) # 8128 13
@@ -41,12 +42,11 @@ colnames(car)[which(names(car) == "V4")] <- "Engine"
 colnames(car)[which(names(car) == "V5")] <- "Max_power"
 car <- subset(car, select = -c(name,year, mileage, engine, max_power))
 
-head(car)
 car$years = as.double(car$years)
 car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
 car$Max_power = as.double(car$Max_power)
-
+head(car)
 
 full.model = lm(selling_price ~ .- torque -manufacturer, data = car)
 step.model_for = stepAIC(full.model, direction = "forward", trace = FALSE)
