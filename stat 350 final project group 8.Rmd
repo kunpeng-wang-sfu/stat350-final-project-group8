@@ -46,12 +46,12 @@ unique(car$manufacturer)
 #japan <-c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")
 #car[manufacturer %in% japan, country := "japan"]
 car$manufacturer = as.character(car$manufacturer)
-car$manufacturer[car$manufacturer %in% c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "Japan"
+car$manufacturer[car$manufacturer %in% c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "japan"
 
-car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "Europe"
+car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "europe"
 
-car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen","BMW")] <- "US"
-car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel")] <- "Others"
+car$manufacturer[car$manufacturer %in% c("Ford","Chevrolet","Jeep","Volkswagen","BMW")] <- "us"
+car$manufacturer[car$manufacturer %in% c("Hyundai","Renault","Mahindra","Tata","Datsun","Land","MG","Volvo","Daewoo","Kia","Fiat","Force","Ashok","Opel","Jaguar")] <- "other"
 
 head(car)
 car$manufacturer=as.factor(car$manufacturer) #no test may changed: frank wang 
@@ -60,12 +60,15 @@ car$years = as.double(car$years)
 car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
 car$Max_power = as.double(car$Max_power)
+```
 
+```{r}
 mydata <- car[, -c(1,8,9,10,11,12)]
 head(mydata)
 pairs(mydata)
-
-full.model = lm(selling_price ~ .- torque -manufacturer, data = car)
+```
+```{r}
+full.model = lm(selling_price ~ .- torque , data = car)
 step.model_for = stepAIC(full.model, direction = "forward", trace = FALSE)
 step.model_back = stepAIC(full.model, direction = "backward", trace = FALSE)
 step.model_both= stepAIC(full.model, direction = "both", trace = FALSE)
@@ -73,7 +76,20 @@ step.model_both= stepAIC(full.model, direction = "both", trace = FALSE)
 summary(step.model_for)
 summary(step.model_back)
 summary(step.model_both)
+```
+```{r}
+full.model = lm(selling_price ~ .- torque , data = car)
+step.model_BIC_for = stepwise(full.model,
+     direction = c("both", "backward", "forward"))
+#step.model_BIC_for = stepBIC(full.model, direction = "forward", trace = FALSE)
+#step.model_BIC_back = stepBIC(full.model, direction = "backward", trace = FALSE)
+#step.model_BIC_both= stepBIC(full.model, direction = "both", trace = FALSE)
 
+summary(step.model_BIC_for)
+#summary(step.model_BIC_back)
+#summary(step.model_BIC_both)
+```
+```{r}
 lm1 <- lm(selling_price ~ .  - torque - manufacturer, data = car)
 summary(lm1)
 anova(lm1)
@@ -81,7 +97,8 @@ plot(lm1)
 vcov(lm1)
 vif(lm1)
 confint(lm1, level = 0.95)
-robust.lm <- rlm(selling_price ~ . - torque, data = car, psi = psi.huber)
+robust.lm <- rlm(selling_price ~ .  - torque ,
+                  data = Car_details_v3, psi = psi.huber)
 summary(robust.lm)
 plot(robust.lm)
 (weights <- robust.lm$w)
@@ -97,9 +114,9 @@ test_data <- car[-training_samps, ]
 train.lm <- lm(selling_price ~ .  - torque - manufacturer,
                data = train_data)
 summary(train.lm)
-#preds <- predict(train.lm, test_data[,-1])
-#plot(test_data$selling_price, preds, xlim=c(15,40), ylim=c(15,40))
-#abline(c(0,1))
+preds <- predict(train.lm, test_data[,-1])
+plot(test_data$selling_price, preds, xlim=c(15,40), ylim=c(15,40))
+abline(c(0,1))
 
 
 ```
