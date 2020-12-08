@@ -5,6 +5,7 @@ date: "2020/11/24"
 output: html_document
 ---
 
+
 ```{r}
 library(readr)
 library(MASS)
@@ -14,142 +15,189 @@ library(StepReg)
 library(ggplot2)
 library(performance)
 library(Metrics)
+```
 
 
+# Data Cleaning
+```{r}
+# Read in the original data
 data3 <- read_csv("Car details v3.csv")
 dim(data3) # 8128 13
+
+# Only keep observations with complete information
 Car_details_v3 <- data3[complete.cases(data3), ]
-head(Car_details_v3)
-names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" "owner" "mileage" "engine" "max_power" "torque" "seats"  
+names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller_type" "transmission" 
+                      # "owner" "mileage" "engine" "max_power" "torque" "seats"      13 predictors
 dim(Car_details_v3) # 7906 13
 
+# Print the original data
+head(Car_details_v3)
 
-Car_details_v3$fuel=as.factor(Car_details_v3$fuel)
-Car_details_v3$seller_type=as.factor(Car_details_v3$seller_type)
-Car_details_v3$transmission=as.factor(Car_details_v3$transmission)
-Car_details_v3$owner=as.factor(Car_details_v3$owner)
+# Deal with qualitative variables: fuel, seller type, transmission, and owner
+Car_details_v3$fuel = as.factor(Car_details_v3$fuel)
+Car_details_v3$seller_type = as.factor(Car_details_v3$seller_type)
+Car_details_v3$transmission = as.factor(Car_details_v3$transmission)
+Car_details_v3$owner = as.factor(Car_details_v3$owner)
 
-
-years = 2020 - Car_details_v3$year
+# Split columns to be numerical part and unit part
+Years = 2020 - Car_details_v3$year
 Name = str_split_fixed(Car_details_v3$name, " ", 2)
-Mileage= str_split_fixed(Car_details_v3$mileage, " ", 2)
-Engine= str_split_fixed(Car_details_v3$engine, " ", 2)
-Max_power= str_split_fixed(Car_details_v3$max_power, " ", 2)
+Mileage = str_split_fixed(Car_details_v3$mileage, " ", 2)
+Engine = str_split_fixed(Car_details_v3$engine, " ", 2)
+Max_power = str_split_fixed(Car_details_v3$max_power, " ", 2)
 
-sub_1 = cbind(Name,years,Mileage,Engine,Max_power)
+# Strip off the unit part and keep the plain numerical part
+sub_1 = cbind(Name, Years, Mileage, Engine, Max_power)
 sub_2 = sub_1[,-c(2,5,7,9)]
-car <- cbind(sub_2,Car_details_v3)
+car1 <- cbind(sub_2, Car_details_v3)
 
-colnames(car)[which(names(car) == "V1")] <- "manufacturer"
-colnames(car)[which(names(car) == "V3")] <- "Mileage"
-colnames(car)[which(names(car) == "V4")] <- "Engine"
-colnames(car)[which(names(car) == "V5")] <- "Max_power"
-car <- subset(car, select = -c(name,year, mileage, engine, max_power))
-unique(car$manufacturer)
+# Rename four columns and omit five duplicated columns to form "car"
+colnames(car1)[which(names(car1) == "V1")] <- "Manufacturer"
+colnames(car1)[which(names(car1) == "V3")] <- "Mileage"
+colnames(car1)[which(names(car1) == "V4")] <- "Engine"
+colnames(car1)[which(names(car1) == "V5")] <- "Max_power"
+car <- subset(car1, select = -c(name, year, mileage, engine, max_power))
 
-car$manufacturer = as.character(car$manufacturer)
-car$manufacturer[car$manufacturer %in% c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "Japan"
+# Find unique car manufacturers and categorize them into 5 categories according to countries
+unique(car$Manufacturer)
+car$Manufacturer = as.character(car$Manufacturer)
+car$Manufacturer[car$Manufacturer %in% 
+                 c("Maruti","Honda","Toyota","Mitsubishi","Nissan","Lexus","Isuzu")] <- "Japan"
+car$Manufacturer[car$Manufacturer %in% 
+                 c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "Germany"
+car$Manufacturer[car$Manufacturer %in% 
+                 c("Renault", "Land", "MG", "Volvo", "Fiat", "Opel","Jaguar")] <- "other Europe"
+car$Manufacturer[car$Manufacturer %in% 
+                 c( "Hyudai", "Mahindra", "Tata", "Datsun", "Daewoo", "Kia", "Force", "Ashok","Hyundai")] <- "other Asia"
+car$Manufacturer[car$Manufacturer %in% c("Ambassador","Ford","Chevrolet","Jeep")] <- "US"
 
-car$manufacturer[car$manufacturer %in% c("Skoda","Mercedes-Benz","Audi","Volkswagen","BMW")] <- "Germany"
-
-car$manufacturer[car$manufacturer %in% c("Renault", "Land", "MG", "Volvo", "Fiat", "Opel","Jaguar")] <- "otherEurope"
-
-car$manufacturer[car$manufacturer %in% c( "Hyudai", "Mahindra", "Tata", "Datsun", "Daewoo", "Kia", "Force", "Ashok","Hyundai")] <- "otherAsia"
-
-car$manufacturer[car$manufacturer %in% c("Ambassador","Ford","Chevrolet","Jeep")] <- "US"
-
-
-
-head(car)
-car$manufacturer=as.factor(car$manufacturer)
-car$years = as.double(car$years)
+# Change type character to be type double
+car$Manufacturer = as.factor(car$Manufacturer)
+car$Years = as.double(car$Years)
 car$Mileage = as.double(car$Mileage)
 car$Engine = as.double(car$Engine)
 car$Max_power = as.double(car$Max_power)
 
-
-
-#Data Deascripution
-
-library(ggplot2)
-
-ggplot(car) +
-  geom_bar(mapping = aes(x=manufacturer,fill=seller_type))
-ggplot(car) +
-  geom_bar(mapping = aes(x=fuel,fill=transmission))
-ggplot(car) +
-  geom_bar(mapping = aes(x=transmission,fill=fuel))
-ggplot(car) +
-  geom_bar(mapping = aes(x=seller_type,fill=manufacturer))
-ggplot(car) +
-  geom_bar(mapping = aes(x=seller_type,fill=owner))
-ggplot(car) +
-  geom_bar(mapping = aes(x=owner,fill=seller_type))
-
-
-#summary(car$manufacturer)
-
-
-```
-
-```{r}
-mydata <- car[, -c(1,8,9,10,11,12)]
-head(mydata)
-pairs(mydata)
+# Print the revised data:
+# Double type: years, mileage, engine, max power, selling price, km driven, seats
+# Factor type: manufacturer, fuel, seller type, transmission, owner
+# Character type: torque (will not be analyzed)
+head(car)
 ```
 
 
+# Data Description
 ```{r}
+summary(car$Manufacturer)
+summary(car$fuel)
+summary(car$seller_type)
+summary(car$owner)
+summary(car$transmission)
+
+ggplot(car) +
+  geom_bar(mapping = aes(x = Manufacturer, fill = seller_type)) + 
+  ggtitle("Seller Type wrt Manufacturer")
+ggplot(car) +
+  geom_bar(mapping = aes(x = seller_type, fill = Manufacturer)) +
+  ggtitle("Manufacturer wrt Seller Type")
+ggplot(car) +
+  geom_bar(mapping = aes(x = fuel, fill = transmission)) +
+  ggtitle("Transmission wrt Fuel Type")
+ggplot(car) +
+  geom_bar(mapping = aes(x = transmission, fill = fuel)) +
+  ggtitle("Fuel Type wrt Transmission")
+ggplot(car) +
+  geom_bar(mapping = aes(x = seller_type, fill = owner)) +
+  ggtitle("Owner wrt Seller Type")
+ggplot(car) +
+  geom_bar(mapping = aes(x = owner, fill = seller_type)) +
+  ggtitle("Seller Type wrt Owner")
+```
+
+```{r}
+# Test colinearity relationship between numerical variables
+car2 <- car[, -c(1,8,9,10,11,12)]
+pairs(car2)
+```
 
 
+# Vriable Selection
+```{r}
+# Full model (omit torque)
+car3 <- subset(car, select = -c(torque))
+full.model = lm(selling_price ~., data = car3)
+summary(full.model)
+full.model_1= lm(selling_price ~ 1 , data = car3)
 
-car <- subset(car, select = -c(torque))
-full.model = lm(selling_price ~., data = car)
-#summary(full.model)
-full.model_1= lm(selling_price ~ 1 , data = car)
+# Backward Elimination, Forward Selection, Stepwise Regression
 step(full.model, direction = "backward")
 step(full.model_1, direction = "forward",scop = formula(full.model))
 step(full.model, direction = "both")
 
-car <- subset(car, select = -c(seats, Max_power))
-
+# Decide to omit two least important variables: seats and max power.
+car4 <- subset(car3, select = -c(seats, Max_power))
+head(car4)
 ```
 
 
-
+# Data Transformation
 ```{r}
-
-lm1 <- lm(selling_price ~ .,data = car) 
+lm1 <- lm(selling_price ~ ., data = car4)
 summary(lm1)
-anova(lm1)
 plot(lm1)
-vcov(lm1)
-vif(lm1)
-confint(lm1, level = 0.95)
+
+# Take the log transformation of response variable: selling price
+log1.lm <- lm(log(selling_price) ~ ., data = car4)
+summary(log1.lm)
+plot(log1.lm)
+
+# Omit some problematic observations: 165, 1758, 3378, 3898, 4257, 5022, 6048, 6432, 6492, 7154, 7521, 7823
+car <- car4[-c(165, 1758, 3378, 3898, 4257, 5022, 6048, 6432, 6492, 7154, 7521, 7823),]
+log.lm <- lm(log(selling_price) ~ ., data = car)
+summary(log.lm)
+plot(log.lm)
+anova(log.lm)
+#vcov(log.lm)
+vif(log.lm)
+#confint(log.lm, level = 0.95)
+```
 
 
-# huber
-robust_huber.lm <- rlm(selling_price ~., data = car, psi = psi.huber)
+# Robust Regression
+```{r}
+# Huber’s t Function
+robust_huber.lm <- rlm(log(selling_price) ~., data = car, psi = psi.huber)
 summary(robust_huber.lm)
 plot(robust_huber.lm)
-(weights <- robust_huber.lm$w)
+weights <- robust_huber.lm$w
 plot(weights, main = "huber: Weights v.s. the Observation Number")
+```
 
 
-
-
-# Prediction
+# Prediction: Cross Validation
+```{r}
+# Split data into 80% for training the model and 20% of the data for testing the model
 set.seed(1168)
-nsamp = ceiling(0.8*length(car$selling_price))
-training_samps = sample(c(1:length(car$selling_price)),nsamp)
+nsamp = ceiling(0.8 * length(car$selling_price))
+training_samps = sample(c(1:length(car$selling_price)), nsamp)
 training_samps = sort(training_samps)
 train_data <- car[training_samps, ]
 test_data <- car[-training_samps, ]
-train.lm <- lm(selling_price ~ ., data = train_data)
+
+# Fit the log model using the training data
+train.lm <- lm(log(selling_price) ~ ., data = train_data)
 summary(train.lm)
+test_data$selling_price = log(test_data$selling_price)
+
+# Predict the selling price using the testing data
 preds <- predict(train.lm, test_data)
 plot(test_data$selling_price, preds)
 abline(c(0,1))
 
-
+# Evaluate the quality of our prediction
+R.sq = r2(preds, test_data$selling_price)
+RMSPE = rmse(preds, test_data$selling_price)
+MAPE = mae(preds, test_data$selling_price)
+print(c(R.sq, RMSPE, MAPE))
 ```
+
