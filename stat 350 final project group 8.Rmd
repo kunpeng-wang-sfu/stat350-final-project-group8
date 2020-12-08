@@ -111,15 +111,14 @@ plot(robust_bisquare.lm)
 (weights <- robust_bisquare.lm$w)
 plot(weights, main = "bisquare: Weights v.s. the Observation Number")
 
-
+# Prediction
 set.seed(1168)
 nsamp = ceiling(0.8*length(car$selling_price))
 training_samps = sample(c(1:length(car$selling_price)),nsamp)
 training_samps = sort(training_samps)
 train_data <- car[training_samps, ]
 test_data <- car[-training_samps, ]
-train.lm <- lm(selling_price ~ .  - torque - manufacturer,
-               data = train_data)
+train.lm <- lm(selling_price ~ .  - torque - manufacturer, data = train_data)
 summary(train.lm)
 #preds <- predict(train.lm, test_data[,-1])
 #plot(test_data$selling_price, preds, xlim=c(15,40), ylim=c(15,40))
