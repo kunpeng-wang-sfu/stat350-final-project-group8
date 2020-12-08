@@ -32,11 +32,12 @@ names(Car_details_v3) # "name" "year" "selling_price" "km_driven" "fuel" "seller
                       # "owner" "mileage" "engine" "max_power" "torque" "seats"      13 predictors
 dim(Car_details_v3) # 7906 13
 
-#Introduce one new additional data point into your assigned dataset
-one_new <- data.frame("Maruti Swift Dzire VDi",2009,270000,150000,"Diesel","Individual","Manual" ,"Second Owner","19.5 kmpl", "1248 CC","74 bhp","190Nm@ 2000rpm",5)
-names(one_new) <- c("name", "year", "selling_price", "km_driven", "fuel","seller_type","transmission","owner","mileage","engine","max_power","torque","seats")
-Car_details_v3 <- rbind(Car_details_v3, one_new)  
-
+# Introduce one new additional data point into our assigned dataset
+one_new <- data.frame("Maruti Swift Dzire VDi", 2009, 270000, 150000, "Diesel", "Individual", "Manual", 
+                      "Second Owner", "19.5 kmpl", "1248 CC", "74 bhp", "190Nm@ 2000rpm",5)
+names(one_new) <- c("name", "year", "selling_price", "km_driven", "fuel", "seller_type", "transmission", 
+                    "owner", "mileage", "engine", "max_power", "torque", "seats")
+Car_details_v3 <- rbind(Car_details_v3, one_new) 
 
 # Print the original data
 head(Car_details_v3)
@@ -129,9 +130,7 @@ ggplot(car) +
   ggtitle("Distrubution of Mileage")
 ggplot(car) +
   geom_bar(mapping = aes(x = Engine))+
-  ggtitle("Distrubution of Engine")
-
-  
+  ggtitle("Distrubution of Engine")  
 ```
 
 ```{r}
@@ -220,4 +219,3 @@ RMSPE = rmse(preds, test_data$selling_price)
 MAPE = mae(preds, test_data$selling_price)
 print(c(R.sq, RMSPE, MAPE))
 ```
-
