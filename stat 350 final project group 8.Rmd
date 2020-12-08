@@ -98,18 +98,12 @@ vif(lm1)
 confint(lm1, level = 0.95)
 
 # huber
-robust_huber.lm <- rlm(selling_price ~ . - torque, data = car, psi = psi.huber)
+robust_huber.lm <- rlm(selling_price ~ . , data = car, psi = psi.huber)
 summary(robust_huber.lm)
 plot(robust_huber.lm)
 (weights <- robust_huber.lm$w)
 plot(weights, main = "huber: Weights v.s. the Observation Number")
 
-# bisqure
-robust_bisquare.lm <- rlm(selling_price ~ . - torque, data = car, psi = psi.bisquare)
-summary(robust_bisquare.lm)
-plot(robust_bisquare.lm)
-(weights <- robust_bisquare.lm$w)
-plot(weights, main = "bisquare: Weights v.s. the Observation Number")
 
 # Prediction
 set.seed(1168)
