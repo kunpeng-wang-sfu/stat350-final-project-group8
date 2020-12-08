@@ -1,17 +1,19 @@
 ---
 title: "stat 350 final project"
-author: "GROUP 8"
+author: "GROUP 8: Xuefei Li, Kunpeng Wang, Wenzhao Wang, Mengqi Xie"
 date: "2020/11/24"
 output: html_document
 ---
 
 ```{r}
-
 library(readr)
 library(MASS)
 library(stringr)
 library(car)
 library(StepReg)
+library(ggplot2)
+library(performance)
+library(Metrics)
 
 
 data3 <- read_csv("Car details v3.csv")
