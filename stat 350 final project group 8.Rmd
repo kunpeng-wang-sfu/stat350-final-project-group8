@@ -103,7 +103,7 @@ pairs(mydata)
 
 car <- subset(car, select = -c(torque))
 full.model = lm(selling_price ~., data = car)
-summary(full.model)
+#summary(full.model)
 full.model_1= lm(selling_price ~ 1 , data = car)
 step(full.model, direction = "backward")
 step(full.model_1, direction = "forward",scop = formula(full.model))
