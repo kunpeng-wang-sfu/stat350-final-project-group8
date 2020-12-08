@@ -120,6 +120,18 @@ ggplot(car) +
 ggplot(car) +
   geom_bar(mapping = aes(x = owner, fill = seller_type)) +
   ggtitle("Seller Type wrt Owner")
+
+ggplot(car) +
+  geom_bar(mapping = aes(x = Years))+
+  ggtitle("Distrubution of Years")
+ggplot(car) +
+  geom_bar(mapping = aes(x = Mileage))+
+  ggtitle("Distrubution of Mileage")
+ggplot(car) +
+  geom_bar(mapping = aes(x = Engine))+
+  ggtitle("Distrubution of Engine")
+
+  
 ```
 
 ```{r}
