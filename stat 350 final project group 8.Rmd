@@ -105,7 +105,7 @@ plot(robust_huber.lm)
 plot(weights, main = "huber: Weights v.s. the Observation Number")
 
 # bisqure
-robust_bisquare.lm <- rlm(selling_price ~ . - torque, data = car, psi = psi.bisqure)
+robust_bisquare.lm <- rlm(selling_price ~ . - torque, data = car, psi = psi.bisquare)
 summary(robust_bisquare.lm)
 plot(robust_bisquare.lm)
 (weights <- robust_bisquare.lm$w)
