@@ -10,11 +10,13 @@ CAR DETAILS FROM CAR DEKHO.csv: Original dataset.
 
 Car details v3.csv: Original dataset.
 
+Predicting the Price of Used Cars using Regression Analysis Techniques.pdf: Final report.
+
 car data.csv: Original dataset.
 
 stat 350 final project group 8.Rmd: Main file, in R Markdown.
 
-stat-350-final-project-group-8.pdf: 
+stat-350-final-project-group-8.pdf: R Markdown in pdf.
 
 
 # Summary of The Project
