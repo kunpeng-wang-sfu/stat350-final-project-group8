@@ -14,7 +14,7 @@ car data.csv: Original dataset.
 
 stat 350 final project group 8.Rmd: Main file, in R Markdown.
 
-stat 350 final project group 8.pdf: Final report.
+stat-350-final-project-group-8.pdf: 
 
 
 # Summary of The Project
